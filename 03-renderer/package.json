@@ -1,0 +1,12 @@
+{
+  "name": "03-renderer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "changshou83 <1369548156@qq.com>",
+  "license": "ISC"
+}
