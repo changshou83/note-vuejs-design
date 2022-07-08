@@ -1,5 +1,6 @@
 import browserAppConfig from "./browserAppConfig.mjs";
 import createRenderer from "./createRenderer.mjs";
+import { Text, Comment, Fragment } from "./NodeType.mjs";
 
 const browserApp = createRenderer(browserAppConfig)
 
@@ -80,6 +81,30 @@ const vnode = {
         }
       },
       children: 'hello'
+    },
+    {
+      type: 'ul',
+      children: [{
+        type: Fragment,
+        children: [
+          {type: 'li', children: '1'},
+          {type: 'li', children: '2'},
+          {type: 'li', children: '3'},
+        ]
+      }]
+    },
+    {
+      type: 'div',
+      children: [
+        {
+          type: Comment,
+          children: '这里是注释'
+        },
+        {
+          type: Text,
+          children: 'hello'
+        }
+      ]
     }
   ]
 }

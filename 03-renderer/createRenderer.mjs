@@ -1,4 +1,4 @@
-import { Text, Comment } from './NodeType.mjs'
+import { Text, Comment, Fragment } from './NodeType.mjs'
 
 /**
  * 创建渲染器
@@ -41,7 +41,6 @@ export default function createRenderer(options) {
         patchProps(el, key, null, vnode.props[key])
       }
     }
-
 
     insert(el, container);
   }
@@ -124,8 +123,6 @@ export default function createRenderer(options) {
       } else {
         patchElement(node, newNode)
       }
-    } else if(typeof type === 'object') {
-      // 组件
     } else if(type === Text) {
       if(!node) {
         const el = newNode.el = createText(newNode.children)
@@ -142,6 +139,11 @@ export default function createRenderer(options) {
         const el = newNode.el = node.el
         if(newNode.children !== node.children) setComment(el, newNode.children)
       }
+    } else if(type === Fragment) {
+      // 如果旧vnode不存在，则需要将Fragment的children逐个挂载
+      // 否则只需要更新子节点即可
+      if(!node) newNode.children.forEach(component => patch(null, component, container))
+      else patchChild(node, newNode, container)
     }
   }
 
@@ -150,6 +152,12 @@ export default function createRenderer(options) {
    * @param vnode 虚拟节点
    */
   function unmount(vnode) {
+    // 卸载Fragment类型vnode
+    if(vnode.type === Fragment) {
+      vnode.children.forEach(component => unmount(component))
+      return;
+    }
+
     const parent = vnode.el.parentNode
     if(parent) parent.removeElement(el)
   }
