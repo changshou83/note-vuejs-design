@@ -17,7 +17,7 @@ export default function createRenderer(options) {
    * @param container 
    */
   function mountElement(vnode, container) {
-    const el = createElement(vnode.type);
+    const el = vnode.el = createElement(vnode.type);
     
     // 处理children
     if(typeof vnode.children === 'string') {
@@ -55,6 +55,14 @@ export default function createRenderer(options) {
     }
   }
   /**
+   * 卸载元素
+   * @param vnode 虚拟节点
+   */
+  function unmount(vnode) {
+    const parent = vnode.el.parentNode
+    if(parent) parent.removeElement(el)
+  }
+  /**
    * 执行渲染任务
    * @param vnode 要渲染的结构
    * @param container 容器元素
@@ -63,9 +71,11 @@ export default function createRenderer(options) {
     if(vnode) {
       // 挂载 or 打补丁
       patch(container._vnode, vnode, container)
-    } else if(container._vnode) {
-      // 卸载
-      container.innerHTML = ''
+    } else {
+      if(container._vnode) {
+        // 卸载
+        unmount(container._vnode)
+      }
     }
 
     container._vnode = vnode;
