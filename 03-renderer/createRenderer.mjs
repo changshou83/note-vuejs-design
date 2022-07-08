@@ -17,59 +17,7 @@ export default function createRenderer(options) {
     setComment,
   } = options
 
-  /**
-   * 使用自定义API来挂载元素，以此来达到跨平台的目的
-   * @param vnode 
-   * @param container 
-   */
-  function mountElement(vnode, container) {
-    const el = vnode.el = createElement(vnode.type);
-    
-    // 处理children
-    if(typeof vnode.children === 'string') {
-      setElement(el, vnode.children)
-    } else if(Array.isArray(vnode.children)) {
-      vnode.children.forEach(child => {
-        // 挂载子节点
-        patch(null, child, el)
-      });
-    }
-    
-    // 处理props
-    if(vnode.props) {
-      for(const key in vnode.props) {
-        patchProps(el, key, null, vnode.props[key])
-      }
-    }
-
-    insert(el, container);
-  }
-  
-  /**
-   * 更新元素
-   * @param node 老节点
-   * @param newNode 新节点
-   */
-  function patchElement(node, newNode) {
-    const el = newNode.el = node.el
-    const oldProps = node.props
-    const newProps = newNode.props
-
-    // 更新props
-    for(const key in newProps) {
-      // 更新
-      if(newProps[key] !== oldProps[key]) patchProps(el, key, oldProps[key], newProps[key])
-    }
-    for(const key in oldProps) {
-      // 继承
-      if(!(key in newProps)) patchProps(el, key, oldProps[key], null)
-    }
-
-    // 更新children
-    patchChild(node, newNode, el)
-  }
-
-  /**
+    /**
    * 更新子节点
    * @param {*} node 老节点
    * @param {*} newNode 新节点
@@ -100,7 +48,59 @@ export default function createRenderer(options) {
       else if(typeof node.children === 'string') setElement(container, '')
     }
   }
-  
+
+  /**
+   * 更新元素
+   * @param node 老节点
+   * @param newNode 新节点
+   */
+  function patchElement(node, newNode) {
+    const el = newNode.el = node.el
+    const oldProps = node.props
+    const newProps = newNode.props
+
+    // 更新props
+    for(const key in newProps) {
+      // 更新
+      if(newProps[key] !== oldProps[key]) patchProps(el, key, oldProps[key], newProps[key])
+    }
+    for(const key in oldProps) {
+      // 继承
+      if(!(key in newProps)) patchProps(el, key, oldProps[key], null)
+    }
+
+    // 更新children
+    patchChild(node, newNode, el)
+  }
+
+  /**
+   * 使用自定义API来挂载元素，以此来达到跨平台的目的
+   * @param vnode 
+   * @param container 
+   */
+  function mountElement(vnode, container) {
+    const el = vnode.el = createElement(vnode.type);
+    
+    // 处理children
+    if(typeof vnode.children === 'string') {
+      setElement(el, vnode.children)
+    } else if(Array.isArray(vnode.children)) {
+      vnode.children.forEach(child => {
+        // 挂载子节点
+        patch(null, child, el)
+      });
+    }
+    
+    // 处理props
+    if(vnode.props) {
+      for(const key in vnode.props) {
+        patchProps(el, key, null, vnode.props[key])
+      }
+    }
+
+    insert(el, container);
+  }
+
   /**
    * 在应用挂载or更新时打补丁
    * @param node 旧结构
