@@ -41,7 +41,40 @@ export default {
     parent.insertBefore(el, anchor)
   },
   patchProps(el, key, value, newValue) {
-    if(key === 'class') {
+    if(/^on/.test(key)) {
+      // {onClick: ()=>{}, onChange: [()=>{}]}
+      const invokers = el._vei || (el._vei = {})
+      let invoker = invokers[key]
+
+      const name = key.slice(2).toLowerCase()
+      
+      if(newValue) {
+        if(invoker) {
+          // update
+          invoker.value = newValue;
+        } else {
+          // mount
+          invoker = el._vei[key] = (e) => {
+            // 当事件触发事件早于事件绑定事件时，阻止事件处罚，
+            // 以避免事件冒泡导致刚绑定的事件处理函数被执行
+            if(e.timeStamp < invoker.attached) return false;
+            if(Array.isArray(invoker.value)) {
+              invoker.value.forEach(fn => fn(e))
+            } else {
+              invoker.value(e)
+            }
+          }
+
+          invoker.value = newValue
+          // 获取函数被绑定的时间
+          invoker.attached = performance.now();
+          el.addEventListener(name, invoker)
+        }
+      } else if(invoker) {
+        // unmount
+        el.removeEventListener(name, invoker)
+      }
+    } else if(key === 'class') {
       // 选择性能最优的方法设置class
       el.className = normalizeClass(newValue)
     } else if(key === 'style') {
