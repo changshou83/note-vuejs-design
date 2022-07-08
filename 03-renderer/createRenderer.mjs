@@ -1,3 +1,5 @@
+import { Text, Comment } from './NodeType.mjs'
+
 /**
  * 创建渲染器
  * @param options 自定义渲染器的选项
@@ -8,7 +10,11 @@ export default function createRenderer(options) {
     createElement,
     insert,
     setElement,
-    patchProps
+    patchProps,
+    createText,
+    setText,
+    createComment,
+    setComment,
   } = options
 
   /**
@@ -120,10 +126,25 @@ export default function createRenderer(options) {
       }
     } else if(typeof type === 'object') {
       // 组件
-    } else if(type === 'xxx') {
-      // 其他类型的 vnode
+    } else if(type === Text) {
+      if(!node) {
+        const el = newNode.el = createText(newNode.children)
+        insert(el, container)
+      } else {
+        const el = newNode.el = node.el
+        if(newNode.children !== node.children) setText(el, newNode.children)
+      }
+    } else if(type === Comment) {
+      if(!node) {
+        const el = newNode.el = createComment(newNode.children)
+        insert(el, container)
+      } else {
+        const el = newNode.el = node.el
+        if(newNode.children !== node.children) setComment(el, newNode.children)
+      }
     }
   }
+
   /**
    * 卸载元素
    * @param vnode 虚拟节点
@@ -132,6 +153,7 @@ export default function createRenderer(options) {
     const parent = vnode.el.parentNode
     if(parent) parent.removeElement(el)
   }
+
   /**
    * 执行渲染任务
    * @param vnode 要渲染的结构

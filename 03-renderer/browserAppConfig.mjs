@@ -40,6 +40,18 @@ export default {
   insert(el, parent, anchor = null) {
     parent.insertBefore(el, anchor)
   },
+  createText(text) {
+    return document.createTextNode(text)
+  },
+  setText(el, text) {
+    el.nodeValue = text
+  },
+  createComment(text) {
+    return document.createComment(text)
+  },
+  setComment(el, text) {
+    el.nodeValue = text
+  },
   patchProps(el, key, value, newValue) {
     if(/^on/.test(key)) {
       // {onClick: ()=>{}, onChange: [()=>{}]}
