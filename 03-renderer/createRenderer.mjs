@@ -47,11 +47,25 @@ export default function createRenderer(options) {
    * @param container 容器元素
    */
   function patch(node, newNode, container) {
-    if(!node) {
-      // 挂载
-      mountElement(newNode, container)
-    } else {
-      // 打补丁
+    if(node.type !== newNode.type) {
+      // 如果新旧节点不同就直接卸载旧节点
+      unmount(node);
+      node = null;
+    }
+    
+    // 根据vnode的类型调用组建相关的挂载与更新方法
+    const { type } = newNode;
+    if(typeof type === 'string') {
+      // 普通标签元素
+      if(!node) {
+        mountElement(newNode, container)
+      } else {
+        patchElement(node, newNode)
+      }
+    } else if(typeof type === 'object') {
+      // 组件
+    } else if(type === 'xxx') {
+      // 其他类型的 vnode
     }
   }
   /**
