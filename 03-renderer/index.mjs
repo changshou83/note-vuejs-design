@@ -1,16 +1,7 @@
+import browserAppConfig from "./browserAppConfig.mjs";
 import createRenderer from "./createRenderer.mjs";
 
-const browserApp = createRenderer({
-  createElement(tag) {
-    return document.createElement(tag)
-  },
-  setElement(el, text) {
-    el.textContent = text
-  },
-  insert(el, parent, anchor = null) {
-    parent.insertBefore(el, anchor)
-  }
-})
+const browserApp = createRenderer(browserAppConfig)
 
 const nodeApp = createRenderer({
   createElement(tag) {
@@ -27,15 +18,37 @@ const nodeApp = createRenderer({
   }
 })
 
-const vnode1 = {
-  type: 'h1',
-  children: 'hello'
+const vnode = {
+  type: 'div',
+  props: {
+    id: 'foo',
+  },
+  children: [
+    {
+      type: 'p',
+      props: {
+        class: [
+          'baz',
+          {
+            bar: true,
+            cool: false
+          }
+        ],
+        style: [{
+          color: 'red'
+        },{
+          'font-size': '24px'
+        }]
+      },
+      children: 'hello'
+    }
+  ]
 }
 
 // 自定义容器
-const container = {
-  type: 'root'
-}
+// const container = {
+//   type: 'root'
+// }
 
-browserApp.render(vnode1, document.querySelector('#app'))
-nodeApp.render(vnode1, container)
+browserApp.render(vnode, document.querySelector('#app'))
+// nodeApp.render(vnode, container)

@@ -7,7 +7,8 @@ export default function createRenderer(options) {
   const {
     createElement,
     insert,
-    setElement
+    setElement,
+    patchProps
   } = options
 
   /**
@@ -18,10 +19,24 @@ export default function createRenderer(options) {
   function mountElement(vnode, container) {
     const el = createElement(vnode.type);
     
+    // 处理children
     if(typeof vnode.children === 'string') {
       setElement(el, vnode.children)
+    } else if(Array.isArray(vnode.children)) {
+      vnode.children.forEach(child => {
+        // 挂载子节点
+        patch(null, child, el)
+      });
     }
     
+    // 处理props
+    if(vnode.props) {
+      for(const key in vnode.props) {
+        patchProps(el, key, null, vnode.props[key])
+      }
+    }
+
+
     insert(el, container);
   }
   
